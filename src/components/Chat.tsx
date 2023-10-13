@@ -29,7 +29,7 @@ const Chat = () => {
     })
 
     return (
-        <div style={{ border: "1px solid red", width: "100%" }}>
+        <div>
             <div>
                 {messages.map((message, index) => {
                     return (
