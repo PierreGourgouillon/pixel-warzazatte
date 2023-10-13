@@ -1,5 +1,7 @@
 import { useRef, useEffect, MouseEventHandler } from 'react'
-import DataResponse from './DataResponse'
+import DataResponse from '../models/DataResponse'
+import PixelModel from '../models/PixelModel'
+import WebSocketManager from '../WebSocketManager'
 
 const Canvas = ({ ws }: { ws: WebSocket }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -25,33 +27,32 @@ const Canvas = ({ ws }: { ws: WebSocket }) => {
     const y = event.clientY - rect.top;
     const id = `${x},${y}`;
     const pixelData = { action: 'draw', data: { id, x, y, color: 'black' }, id: pageId };
-    if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(pixelData));
-    } else {
-        console.error('WebSocket is not open: ', ws.readyState);
-    }
+    WebSocketManager.shared.send(pixelData)
   }
 
-  ws.onmessage = (event) => {
+  WebSocketManager.shared.addListener<DataResponse<PixelModel>>('draw', (response) => {
     if (context === null) return
     if (canvas === null) return
-    const response: DataResponse = JSON.parse(event.data);
-    console.log(response.action, response.data)
-    if(response.action === 'draw') {
-        context.fillStyle = response.data.color;
-        context.fillRect(response.data.x, response.data.y, 10, 10);  
-    }
-    else if (response.action === 'init'){
-        Object.values(response.data).forEach(p => {
-          if (context === null) return
-            console.log(p.color, p.x, p.y)
-            context.fillStyle = p.color;
-            context.fillRect(p.x, p.y, 10, 10);  
-        })
-    } else if (response.action === "clear") {
-      context.clearRect(0, 0, canvas.clientWidth, canvas.height)
-    }
-};
+    context.fillStyle = response.data.color;
+    context.fillRect(response.data.x, response.data.y, 10, 10); 
+  })
+
+  WebSocketManager.shared.addListener<DataResponse<PixelModel>>('init', (response) => {
+    if (context === null) return
+    if (canvas === null) return
+    Object.values(response.data).forEach(p => {
+      if (context === null) return
+        console.log(p.color, p.x, p.y)
+        context.fillStyle = p.color;
+        context.fillRect(p.x, p.y, 10, 10);  
+    })
+  })
+
+  WebSocketManager.shared.addListener('clear', (_) => {
+    if (context === null) return
+    if (canvas === null) return
+    context.clearRect(0, 0, canvas.clientWidth, canvas.height)
+  })
 
 ws.onclose = (event) => {
   console.log('WebSocket is closed: ', event.reason);
