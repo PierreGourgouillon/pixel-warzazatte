@@ -4,13 +4,13 @@ import ColorPalette from '../ColorPalette'
 import PixelModel from '../models/PixelModel'
 import WebSocketManager from '../WebSocketManager'
 
-const Canvas = ({ ws }: { ws: WebSocket }) => {
+const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   let canvas: HTMLCanvasElement | null = null
   let context: CanvasRenderingContext2D | null = null
   let pageId: number | null = null
   const gridSize = 50;
-  let [currentColor, setCurrentColor] = useState<string>('black'); // Couleur par défaut
+  let [currentColor, setCurrentColor] = useState<string>('black');
 
   function handleColorChange(color: string) {
     console.log(color)
@@ -58,8 +58,6 @@ const Canvas = ({ ws }: { ws: WebSocket }) => {
     }
   }
 
-  
-
   function onClickCanvas(event: React.MouseEvent<HTMLCanvasElement>) {
     if (canvas == null || context === null) return;
 
@@ -104,32 +102,26 @@ const Canvas = ({ ws }: { ws: WebSocket }) => {
     })
   })
 
-  WebSocketManager.shared.addListener('clear', (_) => {
-    if (context === null) return
-    if (canvas === null) return
-    context.clearRect(0, 0, canvas.clientWidth, canvas.height)
-	drawGrid()
-  })
+  WebSocketManager.shared.webSocket.onclose = (event) => {
+    console.log('WebSocket is closed: ', event.reason);
+  };
 
-ws.onclose = (event) => {
-  console.log('WebSocket is closed: ', event.reason);
-};
+  WebSocketManager.shared.webSocket.onerror = (error) => {
+    console.error('WebSocket error: ', error);
+  };
 
-ws.onerror = (error) => {
-  console.error('WebSocket error: ', error);
-};
-function availableColors() {
-  return [
-    'black',
-    'red',
-    'green',
-    'blue',
-    'yellow',
-    'purple',
-    'orange',
-    'pink',
-  ];
-}
+  function availableColors() {
+    return [
+      'black',
+      'red',
+      'green',
+      'blue',
+      'yellow',
+      'purple',
+      'orange',
+      'pink',
+    ];
+  }
   return (
     <div>
     <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500" style={{border: "1px solid black", margin: "1rem"}}/>
