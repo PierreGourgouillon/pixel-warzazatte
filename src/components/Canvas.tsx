@@ -1,5 +1,6 @@
-import { useRef, useEffect, MouseEventHandler } from 'react'
+import { useRef, useEffect, MouseEventHandler, useState } from 'react'
 import DataResponse from '../models/DataResponse'
+import ColorPalette from '../ColorPalette'
 import PixelModel from '../models/PixelModel'
 import WebSocketManager from '../WebSocketManager'
 
@@ -8,6 +9,15 @@ const Canvas = ({ ws }: { ws: WebSocket }) => {
   let canvas: HTMLCanvasElement | null = null
   let context: CanvasRenderingContext2D | null = null
   let pageId: number | null = null
+  const gridSize = 50;
+  let [currentColor, setCurrentColor] = useState<string>('black'); // Couleur par défaut
+
+  function handleColorChange(color: string) {
+    console.log(color)
+    if (context===null) return
+    currentColor = color
+    //setCurrentColor(color)
+  }
 
   useEffect(() => {
     canvas = canvasRef.current
@@ -18,15 +28,61 @@ const Canvas = ({ ws }: { ws: WebSocket }) => {
 
     pageId = Math.floor(Math.random() * 100)
     console.log(pageId)
+
+    drawGrid()
   }, [])
 
-  function onClickCanvas(event: React.MouseEvent<HTMLElement>) {
-    if (canvas == null) return
+  function drawGrid() {
+    if (canvas == null || context === null) return;
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const pixelSize = canvasWidth / gridSize;
+
+    context.strokeStyle = 'lightgray';
+
+    for (let i = 1; i < gridSize; i++) {
+      const x = (i * pixelSize) + 0.5;
+      context.beginPath();
+      context.moveTo(x, 0);
+      context.lineTo(x, canvasHeight);
+      context.stroke();
+    }
+
+    for (let i = 1; i < gridSize; i++) {
+      const y = (i * pixelSize) + 0.5;
+      context.beginPath();
+      context.moveTo(0, y);
+      context.lineTo(canvasWidth, y);
+      context.stroke();
+    }
+  }
+
+  
+
+  function onClickCanvas(event: React.MouseEvent<HTMLCanvasElement>) {
+    if (canvas == null || context === null) return;
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    const pixelSize = canvasWidth / gridSize;
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const id = `${x},${y}`;
-    const pixelData = { action: 'draw', data: { id, x, y, color: 'black' }, id: pageId };
+    const pixelX = Math.floor(x / pixelSize);
+    const pixelY = Math.floor(y / pixelSize);
+    const pixelData = {
+      action: 'draw',
+      data: {
+		id: id,
+        x: pixelX * pixelSize,
+        y: pixelY * pixelSize,
+        color: currentColor,
+      },
+      id: pageId,
+    };
     WebSocketManager.shared.send(pixelData)
   }
 
@@ -52,6 +108,7 @@ const Canvas = ({ ws }: { ws: WebSocket }) => {
     if (context === null) return
     if (canvas === null) return
     context.clearRect(0, 0, canvas.clientWidth, canvas.height)
+	drawGrid()
   })
 
 ws.onclose = (event) => {
@@ -61,8 +118,24 @@ ws.onclose = (event) => {
 ws.onerror = (error) => {
   console.error('WebSocket error: ', error);
 };
-
-  return <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500"/>
+function availableColors() {
+  return [
+    'black',
+    'red',
+    'green',
+    'blue',
+    'yellow',
+    'purple',
+    'orange',
+    'pink',
+  ];
+}
+  return (
+    <div>
+    <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500" style={{border: "1px solid black", margin: "1rem"}}/>
+    <ColorPalette colors={availableColors()} onColorSelect={handleColorChange}/>
+    </div>
+  )
 }
 
 export default Canvas
