@@ -1,23 +1,24 @@
-import { useRef, useEffect, MouseEventHandler, useState } from 'react'
+import React, { useRef, useEffect, MouseEventHandler, useState } from 'react'
 import DataResponse from '../models/DataResponse'
-import ColorPalette from '../ColorPalette'
+import ColorPalette from './ColorPalette'
 import PixelModel from '../models/PixelModel'
 import WebSocketManager from '../WebSocketManager'
+import ColorButton from './ColorButton'
+import ColorPicker from './ColorPickerTest'
+import { reduceEachLeadingCommentRange } from 'typescript'
+
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [selectedColor, setSelectedColor] = React.useState<string>('');
   let canvas: HTMLCanvasElement | null = null
   let context: CanvasRenderingContext2D | null = null
   let pageId: number | null = null
   const gridSize = 50;
-  let [currentColor, setCurrentColor] = useState<string>('black');
 
-  function handleColorChange(color: string) {
-    console.log(color)
-    if (context===null) return
-    currentColor = color
-    //setCurrentColor(color)
-  }
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+  };
 
   useEffect(() => {
     canvas = canvasRef.current
@@ -30,7 +31,7 @@ const Canvas = () => {
     console.log(pageId)
 
     drawGrid()
-  }, [])
+  }, [selectedColor])
 
   function drawGrid() {
     if (canvas == null || context === null) return;
@@ -64,7 +65,7 @@ const Canvas = () => {
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
 
-    const pixelSize = canvasWidth / gridSize;
+    const pixelSize = (canvasWidth / gridSize);
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -74,10 +75,10 @@ const Canvas = () => {
     const pixelData = {
       action: 'draw',
       data: {
-		id: id,
+        id: id,
         x: pixelX * pixelSize,
         y: pixelY * pixelSize,
-        color: currentColor,
+        color: selectedColor, //selectedColor.split("-")[0]
       },
       id: pageId,
     };
@@ -109,23 +110,14 @@ const Canvas = () => {
   WebSocketManager.shared.webSocket.onerror = (error) => {
     console.error('WebSocket error: ', error);
   };
-
-  function availableColors() {
-    return [
-      'black',
-      'red',
-      'green',
-      'blue',
-      'yellow',
-      'purple',
-      'orange',
-      'pink',
-    ];
-  }
+  
   return (
     <div>
     <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500" style={{border: "1px solid black", margin: "1rem"}}/>
-    <ColorPalette colors={availableColors()} onColorSelect={handleColorChange}/>
+    <div>
+      <ColorPicker onColorChange={handleColorChange}/>
+    </div>
+      <p>La couleur actuellement sélectionnée est : {selectedColor}</p>
     </div>
   )
 }
