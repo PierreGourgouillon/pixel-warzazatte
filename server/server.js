@@ -11,12 +11,15 @@ let chatMessages = []
 let users = []
 
 wss.on('connection', (ws) => {
-    ws.send(JSON.stringify({ action: 'init', data: pixels }));
-    ws.send(JSON.stringify({ action: 'init-chat', data: chatMessages }));
-
     ws.on('message', (response) => {
         const { action, data } = JSON.parse(response);
         console.log(action, data)
+
+        if (action === "add-user") {
+            users.push(data.name)
+            ws.send(JSON.stringify({ action: 'init', data: pixels }));
+            ws.send(JSON.stringify({ action: 'init-chat', data: chatMessages }));
+        }
 
         if (action === 'draw') {
             pixels[data.id] = data;
