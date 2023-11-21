@@ -11,17 +11,20 @@ function App() {
   const [username, setUsername] = useState<string>("")
 
   function onButtonJoinClick(event: React.MouseEvent<HTMLElement>) {
-    const newUsername: UserModel = { name: username }
-    const body: DataResponse<UserModel> = { action: "add-user", data: newUsername }
-    WebSocketManager.shared.send(body)
-    setConnected(true)
+    if (username !== "") {
+      const newUsername: UserModel = { name: username }
+      const body: DataResponse<UserModel> = { action: "add-user", data: newUsername }
+      WebSocketManager.shared.send(body)
+      setConnected(true)
+    }
   }
 
   return (
     <div className="App">
       {!isConnected && (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <input onChange={(event) => { setUsername(event.target.value) }} value={username}/>
+        <div style={{ display: "flex", justifyContent: "center",  }} className="flex-col content-center items-center h-screen">
+          <h1 className='text-black font-bold text-5xl'>Bienvenue sur Pixel Warzazatte</h1>
+          <input className="w-60 my-10 border-black border-solid focus:outline-none" onChange={(event) => { setUsername(event.target.value) }} value={username} placeholder='Veuillez choisir un pseudo'/>
           <button onClick={onButtonJoinClick}>Join</button>
         </div>
       )}

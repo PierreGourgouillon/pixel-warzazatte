@@ -13,9 +13,9 @@ interface ColorPickerState {
 
 export function ColorPicker({ onColorChange }: ColorPickerProps) {
   const initialState: ColorPickerState = {
-    colors: ['slate', 'gray', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'],
-    currentColor: 'green',
-    iconColor: '',
+    colors: ['gray', 'red', 'orange', 'yellow', 'lime', 'green', 'teal', 'cyan', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'black'],
+    currentColor: 'black',
+    iconColor: 'text-white',
     isOpen: false,
   };
 
@@ -25,7 +25,7 @@ export function ColorPicker({ onColorChange }: ColorPickerProps) {
     setState((prevState) => ({
       ...prevState,
       currentColor: color,
-      iconColor: 'text-black',
+      iconColor: color === 'yellow' || color === 'lime' || color === 'cyan' ? 'text-black' : 'text-white',
       isOpen: false
     }));
     onColorChange(color);
@@ -38,7 +38,7 @@ export function ColorPicker({ onColorChange }: ColorPickerProps) {
   return (
     <div className="bg-white mx-auto my-auto p-6">
       <div>
-        <div className="flex flex-row relative">
+        <div className="relative">
           <div
             onClick={() => setState((prevState) => ({ ...prevState, isOpen: !prevState.isOpen }))}
             className={`cursor-pointer rounded-full ml-3 my-auto h-10 w-10 flex bg-${state.currentColor}-p`}
@@ -60,11 +60,11 @@ export function ColorPicker({ onColorChange }: ColorPickerProps) {
           </div>
           {state.isOpen && (
             <div
-              className="border border-gray-300 origin-top-right absolute right-0 top-full mt-2 rounded-md shadow-lg"
+              className="border border-gray-300 origin-top-right right-0 top-full mt-2 rounded-md shadow-lg"
             >
-              <div className="rounded-md bg-white shadow-xs p-2">
-                <div className='invisible bg-pink-p bg-orange-p bg-blue-p bg-red-p bg-rose-p bg-purple-p bg-violet-p bg-yellow-p bg-teal-p bg-cyan-p bg-fuchsia-p bg-sky-p bg-amber-p bg-stone-p bg-slate-p bg-gray-p bg-yellow-p bg-lime-p bg-emerald-p bg-green-p bg-indigo-p'></div>
-                <div className="grid grid-cols-5 gap-2">
+              <div className="rounded-md bg-white shadow-xs p-2 w-max">
+                <div className='invisible bg-pink-p bg-orange-p bg-blue-p bg-red-p bg-purple-p bg-violet-p bg-yellow-p bg-teal-p bg-cyan-p bg-fuchsia-p bg-gray-p bg-lime-p bg-green-p bg-indigo-p bg-black-p'></div>
+                <div className="grid grid-cols-2 gap-2">
                   {state.colors.map((color) => (
                     <div
                       key={color}

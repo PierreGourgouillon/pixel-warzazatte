@@ -78,6 +78,7 @@ const Canvas = () => {
       },
       id: pageId,
     };
+    drawGrid()
     WebSocketManager.shared.send(pixelData)
   }
 
@@ -108,7 +109,7 @@ const Canvas = () => {
   };
   
   return (
-    <div>
+    <div className='flex'>
       <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500" style={{border: "1px solid black", margin: "1rem"}}/>
       <div>
         <ColorPicker onColorChange={handleColorChange}/>
