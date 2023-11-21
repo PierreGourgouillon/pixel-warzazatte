@@ -95,7 +95,7 @@ const Canvas = () => {
       if (context === null) return
         console.log(p.color, p.x, p.y)
         context.fillStyle = p.color;
-        context.fillRect(p.x, p.y, 10, 10);  
+        context.fillRect(p.x, p.y, 10, 10);
     })
   })
 

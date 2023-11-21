@@ -14,7 +14,7 @@ interface ColorPickerState {
 export function ColorPicker({ onColorChange }: ColorPickerProps) {
   const initialState: ColorPickerState = {
     colors: ['slate', 'gray', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'],
-    currentColor: 'black',
+    currentColor: 'green',
     iconColor: '',
     isOpen: false,
   };

@@ -8,6 +8,7 @@ const wss = new WebSocket.Server({ server });
 
 let pixels = {};
 let chatMessages = []
+let users = []
 
 wss.on('connection', (ws) => {
     ws.send(JSON.stringify({ action: 'init', data: pixels }));
@@ -37,7 +38,7 @@ wss.on('connection', (ws) => {
 
         if (action === 'chat') {
             data.date = getTime()
-            chatMessages.push(data)
+            chatMessages.push(data) 
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(JSON.stringify({ action, data }));
