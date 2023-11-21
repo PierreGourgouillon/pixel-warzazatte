@@ -8,14 +8,18 @@ const wss = new WebSocket.Server({ server });
 
 let pixels = {};
 let chatMessages = []
+let users = []
 
 wss.on('connection', (ws) => {
-    ws.send(JSON.stringify({ action: 'init', data: pixels }));
-    ws.send(JSON.stringify({ action: 'init-chat', data: chatMessages }));
-
     ws.on('message', (response) => {
         const { action, data } = JSON.parse(response);
         console.log(action, data)
+
+        if (action === "add-user") {
+            users.push(data.name)
+            ws.send(JSON.stringify({ action: 'init', data: pixels }));
+            ws.send(JSON.stringify({ action: 'init-chat', data: chatMessages }));
+        }
 
         if (action === 'draw') {
             pixels[data.id] = data;
@@ -37,7 +41,7 @@ wss.on('connection', (ws) => {
 
         if (action === 'chat') {
             data.date = getTime()
-            chatMessages.push(data)
+            chatMessages.push(data) 
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(JSON.stringify({ action, data }));

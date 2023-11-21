@@ -4,15 +4,17 @@ import DataResponse from "../models/DataResponse";
 import WebSocketManager from "../WebSocketManager";
 import uuid from 'react-uuid'
 
-const Chat = () => {
+const Chat = ({userName}: {userName: string}) => {
     const [messages, setMessages] = useState<ChatModel[]>([]);
     const [userMessage, setUserMessage] = useState("");
 
     function onClickAddMessage(event: React.MouseEvent<HTMLElement>) {
-        const newMessage: ChatModel = { id: uuid(), message: userMessage, date: "" }
-        const body: DataResponse<ChatModel> = { action: "chat", data: newMessage }
-        WebSocketManager.shared.send(body)
-        setUserMessage("")
+        if (userMessage !== "") {
+          const newMessage: ChatModel = { id: uuid(), message: userMessage, date: "", username: userName }
+          const body: DataResponse<ChatModel> = { action: "chat", data: newMessage }
+          WebSocketManager.shared.send(body)
+          setUserMessage("")
+        }
     }
 
     const onUserMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +36,11 @@ const Chat = () => {
             <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
               {messages.map((message, index) => {
                 return (
-                  <div className="w-full overflow-hidden">{message.date}: {message.message}</div>
+                  <div className="w-max overflow-hidden flex-row">
+                    <span className="text-black text-sm">{message.date} </span>
+                    <span className="text-red-600 font-bold">{message.username}</span>
+                    <span>: {message.message}</span>
+                  </div>
                 )
               })}
             </div>
