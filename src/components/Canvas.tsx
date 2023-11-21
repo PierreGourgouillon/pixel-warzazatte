@@ -1,16 +1,13 @@
-import React, { useRef, useEffect, MouseEventHandler, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import DataResponse from '../models/DataResponse'
-import ColorPalette from './ColorPalette'
 import PixelModel from '../models/PixelModel'
 import WebSocketManager from '../WebSocketManager'
-import ColorButton from './ColorButton'
-import ColorPicker from './ColorPickerTest'
-import { reduceEachLeadingCommentRange } from 'typescript'
+import ColorPicker from './ColorPicker'
 
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const [selectedColor, setSelectedColor] = React.useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
   let canvas: HTMLCanvasElement | null = null
   let context: CanvasRenderingContext2D | null = null
   let pageId: number | null = null
@@ -63,7 +60,6 @@ const Canvas = () => {
     if (canvas == null || context === null) return;
 
     const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
 
     const pixelSize = (canvasWidth / gridSize);
     const rect = canvas.getBoundingClientRect();
@@ -113,11 +109,10 @@ const Canvas = () => {
   
   return (
     <div>
-    <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500" style={{border: "1px solid black", margin: "1rem"}}/>
-    <div>
-      <ColorPicker onColorChange={handleColorChange}/>
-    </div>
-      <p>La couleur actuellement sélectionnée est : {selectedColor}</p>
+      <canvas ref={canvasRef} onClick={onClickCanvas} width="500" height="500" style={{border: "1px solid black", margin: "1rem"}}/>
+      <div>
+        <ColorPicker onColorChange={handleColorChange}/>
+      </div>
     </div>
   )
 }

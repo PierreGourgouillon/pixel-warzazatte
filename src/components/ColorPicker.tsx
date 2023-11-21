@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ColorPickerProps {
   onColorChange: (color: string) => void;
@@ -6,7 +6,6 @@ interface ColorPickerProps {
 
 interface ColorPickerState {
   colors: string[];
-  variants: number[];
   currentColor: string;
   iconColor: string;
   isOpen: boolean;
@@ -14,64 +13,35 @@ interface ColorPickerState {
 
 export function ColorPicker({ onColorChange }: ColorPickerProps) {
   const initialState: ColorPickerState = {
-    colors: ['gray', 'red', 'yellow', 'green', 'blue', 'indigo', 'purple', 'pink'],
-    variants: [100, 200, 300, 400, 500, 600, 700, 800, 900],
-    currentColor: '',
+    colors: ['slate', 'gray', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'],
+    currentColor: 'black',
     iconColor: '',
     isOpen: false,
   };
 
-  const [state, setState] = React.useState<ColorPickerState>(initialState);
+  const [state, setState] = useState<ColorPickerState>(initialState);
 
-  const initColor = () => {
+  const selectColor = (color: string) => {
     setState((prevState) => ({
       ...prevState,
-      currentColor: 'red-800',
-    }));
-    setIconWhite();
-    onColorChange('red-800'); // Appel de la fonction de rappel lors de l'initialisation
-  };
-
-  const setIconWhite = () => {
-    setState((prevState) => ({
-      ...prevState,
-      iconColor: 'text-white',
-    }));
-  };
-
-  const setIconBlack = () => {
-    setState((prevState) => ({
-      ...prevState,
+      currentColor: color,
       iconColor: 'text-black',
+      isOpen: false
     }));
+    onColorChange(color);
   };
 
-  const selectColor = (color: string, variant: number) => {
-    setState((prevState) => ({
-      ...prevState,
-      currentColor: `${color}-${variant}`,
-      iconColor: variant < 500 ? 'text-black' : 'text-white',
-    }));
-    onColorChange(`${color}-${variant}`); // Appel de la fonction de rappel lors de la sélection de la couleur
-  };
-
-  React.useEffect(() => {
-    // Appel de la fonction de rappel lors de chaque mise à jour de l'état
+  useEffect(() => {
     onColorChange(state.currentColor);
   }, [state.currentColor, onColorChange]);
+
   return (
     <div className="bg-white mx-auto my-auto p-6">
       <div>
         <div className="flex flex-row relative">
-          <input
-            id="color-picker"
-            className="border border-gray-400 p-2 rounded-lg"
-            value={state.currentColor}
-            onChange={(e) => setState((prevState) => ({ ...prevState, currentColor: e.target.value }))}
-          />
           <div
             onClick={() => setState((prevState) => ({ ...prevState, isOpen: !prevState.isOpen }))}
-            className={`cursor-pointer rounded-full ml-3 my-auto h-10 w-10 flex bg-${state.currentColor}`}
+            className={`cursor-pointer rounded-full ml-3 my-auto h-10 w-10 flex bg-${state.currentColor}-p`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -93,17 +63,14 @@ export function ColorPicker({ onColorChange }: ColorPickerProps) {
               className="border border-gray-300 origin-top-right absolute right-0 top-full mt-2 rounded-md shadow-lg"
             >
               <div className="rounded-md bg-white shadow-xs p-2">
-                <div className="flex">
+                <div className='invisible bg-pink-p bg-orange-p bg-blue-p bg-red-p bg-rose-p bg-purple-p bg-violet-p bg-yellow-p bg-teal-p bg-cyan-p bg-fuchsia-p bg-sky-p bg-amber-p bg-stone-p bg-slate-p bg-gray-p bg-yellow-p bg-lime-p bg-emerald-p bg-green-p bg-indigo-p'></div>
+                <div className="grid grid-cols-5 gap-2">
                   {state.colors.map((color) => (
-                    <div key={color}>
-                      {state.variants.map((variant) => (
-                        <div
-                          key={`${color}-${variant}`}
-                          onClick={() => selectColor(color, variant)}
-                          className={`cursor-pointer w-6 h-6 rounded-full mx-1 my-1 bg-${color}-${variant}`}
-                        ></div>
-                      ))}
-                    </div>
+                    <div
+                      key={color}
+                      onClick={() => selectColor(color)}
+                      className={`cursor-pointer w-8 h-8 rounded-full mx-1 my-1 bg-${color}-p`}
+                    ></div>
                   ))}
                 </div>
               </div>
